@@ -1,13 +1,16 @@
 /** @jsx jsx */
+import React from "react"
 import { jsx } from "theme-ui"
 import "./App.css"
 import { ThemeProvider } from "theme-ui"
 import theme from "./theme"
 import { Flex } from "theme-ui"
+import Confetti from "react-confetti"
 
 import image from "./Image.svg"
 
 function App() {
+  const [showConfetti, setShowConfetti] = React.useState(false)
   return (
     <ThemeProvider theme={theme}>
       <div className="container">
@@ -29,7 +32,11 @@ function App() {
             <label>
               <input type="password" />
             </label>
-            <button>Zaloguj</button>
+
+            <button onClick={() => setShowConfetti((prev) => !prev)}>
+              Zaloguj
+            </button>
+
             <p>
               <small>
                 Dokładnie sprawdzaj, czy informacje zawarte w SMSie
