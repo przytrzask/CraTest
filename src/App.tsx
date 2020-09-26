@@ -14,6 +14,8 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <div className="container">
+        {showConfetti && <Confetti />}
+
         <main sx={styles.main}>
           <Flex sx={styles.history} bg="primary">
             <img src={image} alt="ZEIT Logo" />
