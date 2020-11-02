@@ -1,5 +1,7 @@
 /** @jsx jsx */
 import React from "react"
+import ReactDOM from "react-dom"
+
 import { jsx } from "theme-ui"
 import "./App.css"
 import { ThemeProvider } from "theme-ui"
@@ -10,13 +12,21 @@ import Confetti from "react-confetti"
 import image from "./Image.svg"
 
 function App() {
-  const [showConfetti, setShowConfetti] = React.useState(false)
+  const [showConfetti] = React.useState(false)
+  const [isOpen, setOpen] = React.useState(false)
+
   return (
     <ThemeProvider theme={theme}>
       <div className="container">
         {showConfetti && <Confetti />}
 
         <main sx={styles.main}>
+          {isOpen && (
+            <WindowPortal onClose={() => setOpen(false)}>
+              <header>content</header>
+              <button onClick={() => setOpen(false)}>close</button>
+            </WindowPortal>
+          )}
           <Flex sx={styles.history} bg="primary">
             <img src={image} alt="ZEIT Logo" />
           </Flex>
@@ -35,7 +45,12 @@ function App() {
               <input type="password" />
             </label>
 
-            <button onClick={() => setShowConfetti((prev) => !prev)}>
+            <button
+              onClick={() => {
+                setOpen(true)
+                // setShowConfetti((prev) => !prev)
+              }}
+            >
               Zaloguj
             </button>
 
@@ -88,3 +103,37 @@ const styles = {
 }
 
 export default App
+
+type Props = {
+  onClose: () => void
+  children: React.ReactNode
+}
+
+export function WindowPortal({ onClose, children }: Props) {
+  const externalWindow = React.useRef<Window>(null)
+  const containerEl = React.useRef(document.createElement("div"))
+
+  React.useEffect(() => {
+    // @ts-ignore
+    externalWindow.current = window.open(
+      "",
+      "",
+      "width=600,height=400,left=200,top=200"
+    )
+    // @ts-ignore
+    externalWindow.current.document.body.appendChild(containerEl.current)
+    // @ts-ignore
+
+    externalWindow.current.addEventListener("beforeunload", () => {
+      onClose()
+    })
+
+    return () => {
+      onClose()
+      // @ts-ignore
+      externalWindow.current.close()
+    }
+  }, [onClose])
+
+  return ReactDOM.createPortal(children, containerEl.current)
+}
